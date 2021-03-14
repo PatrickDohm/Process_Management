@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
     char command = parse[0];
     int firstNumber = parse[2];
     int secondNumber = parse[4];
-    //parent
     if (command == 'C')
     { //fork the process and assign values to pcb
 
@@ -64,15 +63,4 @@ int main(int argc, char *argv[])
     { //Exit the program, this should show the current state of the simulation
     }
 
-    //child
-
-    //State=Ready
-
-    //state= waiting
-
-    //state = running
-
-    //state= terminated
-
-    //state= new
 }
