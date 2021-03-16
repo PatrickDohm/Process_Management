@@ -1,5 +1,5 @@
 Process: process.o
-	g++ process.cpp -o process
+	g++ process.cpp handler.cpp -o process
 
 
 clean:
