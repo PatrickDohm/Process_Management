@@ -7,7 +7,6 @@
             "args": [
                 "-g",
                 "process.cpp",
-                "handler.cpp",
                 "-o",
                 "process"
             ],

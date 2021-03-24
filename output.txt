@@ -1,0 +1,9 @@
+PID0running with 0 left
+Ready Queue:PID
+Wait Queue:PID
+C 1 7
+PID1 7 placed on the READY QUEUE
+PID0running with 0 left
+Ready Queue:PID, 1
+Wait Queue:PID
+I
