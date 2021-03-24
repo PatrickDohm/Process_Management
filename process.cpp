@@ -3,7 +3,9 @@
 #include <fstream>
 #include <cstring>
 #include <vector>
-
+#include <algorithm>
+#include <string>
+#include <string.h>
 typedef enum State_t
 {
     New = 1,
@@ -23,7 +25,7 @@ struct PCB
 };
 typedef struct PCB PCB;
 void execute_command(char command, int firstNumber, int secondNumber, std::ofstream &output);
-void recursive_delete(PCB process);
+void recursive_delete(PCB process, std::ofstream &output);
 std::vector<PCB> Ready_Queue; //the 1st item on the ready queue is next to be added to Running
 std::vector<PCB> Wait_Queue;
 PCB current_process;
@@ -48,35 +50,66 @@ int main(int argc, char *argv[])
     //read input
     while (!input.eof())
     {
+        if (Ready_Queue.size() > 0 && current_process.PID == 0)
+        {
+            init = current_process;
+            current_process = Ready_Queue[0];
+            Ready_Queue.erase(Ready_Queue.begin());
+            current_process.remaining_quantum = quantum;
+            current_process.State = Running;
+        }
         std::string ready_queue_list = "";
         std::string wait_queue_list = "";
         for (int i = 0; i < Ready_Queue.size(); i++)
         {
-            ready_queue_list = ready_queue_list + ", " + std::to_string(Ready_Queue[i].PID);
+            ready_queue_list = ready_queue_list + ", " + std::to_string(Ready_Queue[i].PID) + " " + std::to_string(Ready_Queue[i].burst_time);
         }
         for (int i = 0; i < Wait_Queue.size(); i++)
         {
-            wait_queue_list = wait_queue_list + ", " + std::to_string(Wait_Queue[i].PID);
+            wait_queue_list = wait_queue_list + ", " + std::to_string(Wait_Queue[i].PID) + " " + std::to_string(Wait_Queue[i].burst_time) + " " + std::to_string(Wait_Queue[i].event_id);
         }
-        output << "PID" << current_process.PID << "running with " << current_process.remaining_quantum << " left" << std::endl;
+        output << "PID" << current_process.PID << " " << current_process.burst_time << " running with " << current_process.remaining_quantum << " left" << std::endl;
         output << "Ready Queue:"
                << "PID" << ready_queue_list << std::endl;
         output << "Wait Queue:"
                << "PID" << wait_queue_list << std::endl;
         getline(input, line);
         output << line << std::endl;
+
         //parse input
-        char parse[5];
-        strcpy(parse, line.c_str());
-        char command = parse[0];
-        int firstNumber = parse[2]-48; //The -48 is to convert to an int
-        int secondNumber = parse[4]-48;
+        char *parse;
+        char *line_c_str = const_cast<char *>(line.c_str());
+        int i = 0;
+        char command;
+        int firstNumber;
+        int secondNumber;
+
+        parse = strtok(line_c_str, " ");
+        while (parse != NULL)
+        {
+            if (i == 0)
+            {
+                command = parse[0];
+            }
+            else if (i == 1)
+            {
+                firstNumber = atoi(parse);
+            }
+            else if (i == 2)
+            {
+                secondNumber = atoi(parse);
+            }
+            i++;
+            parse = strtok(NULL, " ");
+        }
+
         if (command == 'X')
         {
             input.close();
             output.close();
             return 0;
         }
+
         execute_command(command, firstNumber, secondNumber, output);
     }
     input.close();
@@ -92,23 +125,27 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
         PCB temp;
         temp.burst_time = secondNumber;
         temp.PID = firstNumber;
+        temp.State = Ready;
         current_process.children.push_back(temp);
         Ready_Queue.push_back(temp);
         output << "PID" << temp.PID << " " << temp.burst_time << " placed on the READY QUEUE" << std::endl;
     }
     else if (command == 'D')
-    {                                      //Destroy the process n and any children it has
-        recursive_delete(current_process); //FIX!!!!!!!
-        if (Ready_Queue.size() != 0)
+    {
+        if (current_process.PID == init.PID)
         {
-            current_process = Ready_Queue[0];
-            Ready_Queue.erase(Ready_Queue.begin());
-            current_process.remaining_quantum = quantum;
-        }
-        else
-        {
-            current_process = init;
-        }
+            recursive_delete(current_process, output); //FIX!!!!!!!
+            if (Ready_Queue.size() != 0)
+            {
+                current_process = Ready_Queue[0];
+                Ready_Queue.erase(Ready_Queue.begin());
+                current_process.remaining_quantum = quantum;
+            }
+            else
+            {
+                current_process = init;
+            }
+        } //Destroy the process n and any children it has
     }
     else if (command == 'I')
     { //Timer Interupt
@@ -116,14 +153,32 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
         {
             current_process.remaining_quantum--;
             current_process.burst_time--;
+
+            if (current_process.burst_time == 0)
+            {
+                recursive_delete(current_process, output);
+                if (Ready_Queue.size() > 0)
+                {
+                    current_process = Ready_Queue[0];
+                    Ready_Queue.erase(Ready_Queue.begin());
+                    current_process.remaining_quantum = quantum;
+                    current_process.State = Running;
+                }
+                else
+                {
+                    current_process = init;
+                }
+            }
         }
 
-        if (current_process.remaining_quantum <= 0)
+        if (current_process.remaining_quantum <= 0) //switch out the current process
         {
+            current_process.State = Ready;
             Ready_Queue.push_back(current_process);
             current_process = Ready_Queue[0];
             Ready_Queue.erase(Ready_Queue.begin());
             current_process.remaining_quantum = quantum;
+            current_process.State = Running;
         }
     }
     else if (command == 'W')
@@ -131,6 +186,7 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
         if (current_process.PID != 0)
         {
             current_process.event_id = firstNumber;
+            current_process.State = Waiting;
             Wait_Queue.push_back(current_process);
         }
 
@@ -139,6 +195,7 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
             current_process = Ready_Queue[0];
             Ready_Queue.erase(Ready_Queue.begin());
             current_process.remaining_quantum = quantum;
+            current_process.State = Running;
         }
         else
         {
@@ -154,13 +211,14 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
             temp = Wait_Queue[i];
             if (temp.event_id == firstNumber)
             {
-                Ready_Queue.push_back(Wait_Queue[i]);
+                temp.State = Ready;
+                Ready_Queue.push_back(temp);
                 Wait_Queue.erase(Wait_Queue.begin() + i);
             }
         }
     }
 }
-void recursive_delete(PCB process)
+void recursive_delete(PCB process, std::ofstream &output)
 {
     //base case is the PCB has no children
     if (process.children.size() == 0)
@@ -172,7 +230,9 @@ void recursive_delete(PCB process)
             {
                 if (Ready_Queue[i].PID == process.PID)
                 {
+
                     Ready_Queue.erase(Ready_Queue.begin() + i);
+                    output << "PCB " << process.PID << " " << process.burst_time << " Terminated" << std::endl;
                 }
             }
         }
@@ -183,8 +243,13 @@ void recursive_delete(PCB process)
                 if (Wait_Queue[i].PID == process.PID)
                 {
                     Wait_Queue.erase(Wait_Queue.begin() + i);
+                    output << "PCB " << process.PID << " " << process.burst_time << " Terminated" << std::endl;
                 }
             }
+        }
+        else
+        {
+            output << "PCB " << process.PID << " " << process.burst_time << " Terminated" << std::endl;
         }
     }
     //recursive case is the PCB has children
@@ -193,8 +258,9 @@ void recursive_delete(PCB process)
         //call the function on all of the children then remove the children
         for (int i = 0; i < process.children.size(); i++)
         {
-            recursive_delete(process.children[i]);
+            recursive_delete(process.children[i], output);
         }
         process.children.clear();
+        recursive_delete(process, output);
     }
 }
