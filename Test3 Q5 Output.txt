@@ -1,0 +1,216 @@
+PID 0 0 running with 0 left
+Ready Queue:PID
+Wait Queue:PID
+C 1 10
+PID 1 10 placed on the READY QUEUE
+PID 1 10 running with 5 left
+Ready Queue:PID
+Wait Queue:PID
+I
+PID 1 9 running with 4 left
+Ready Queue:PID
+Wait Queue:PID
+I
+PID 1 8 running with 3 left
+Ready Queue:PID
+Wait Queue:PID
+W 1
+PID 1 7 1 placed on the WAIT_QUEUE
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1
+C 2 10
+PID 2 10 placed on the READY QUEUE
+PID 2 10 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1
+I
+PID 2 9 running with 4 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1
+I
+PID 2 8 running with 3 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1
+W 2
+PID 2 7 2 placed on the WAIT_QUEUE
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 2 7 2
+D 1
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 2 7 2
+C 3 10
+PID 3 10 placed on the READY QUEUE
+PID 3 10 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 2 7 2
+C 4 10
+PID 4 10 placed on the READY QUEUE
+PID 3 9 running with 4 left
+Ready Queue:PID, 4 10
+Wait Queue:PID, 1 7 1, 2 7 2
+C 5 10
+PID 5 10 placed on the READY QUEUE
+PID 3 8 running with 3 left
+Ready Queue:PID, 4 10, 5 10
+Wait Queue:PID, 1 7 1, 2 7 2
+C 6 10
+PID 6 10 placed on the READY QUEUE
+PID 3 7 running with 2 left
+Ready Queue:PID, 4 10, 5 10, 6 10
+Wait Queue:PID, 1 7 1, 2 7 2
+C 7 10
+PID 7 10 placed on the READY QUEUE
+PID 3 6 running with 1 left
+Ready Queue:PID, 4 10, 5 10, 6 10, 7 10
+Wait Queue:PID, 1 7 1, 2 7 2
+C 8 10
+PID 8 10 placed on the READY QUEUE
+PID 4 10 running with 5 left
+Ready Queue:PID, 5 10, 6 10, 7 10, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2
+W 3
+PID 4 9 3 placed on the WAIT_QUEUE
+PID 5 10 running with 5 left
+Ready Queue:PID, 6 10, 7 10, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3
+W 4
+PID 5 9 4 placed on the WAIT_QUEUE
+PID 6 10 running with 5 left
+Ready Queue:PID, 7 10, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4
+W 5
+PID 6 9 5 placed on the WAIT_QUEUE
+PID 7 10 running with 5 left
+Ready Queue:PID, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 7 9 running with 4 left
+Ready Queue:PID, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 7 8 running with 3 left
+Ready Queue:PID, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 7 7 running with 2 left
+Ready Queue:PID, 3 5, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+D 7
+PCB 7 6 Terminated
+PID 3 5 running with 5 left
+Ready Queue:PID, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 3 4 running with 4 left
+Ready Queue:PID, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 3 3 running with 3 left
+Ready Queue:PID, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 3 2 running with 2 left
+Ready Queue:PID, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+I
+PID 3 1 running with 1 left
+Ready Queue:PID, 8 10
+Wait Queue:PID, 1 7 1, 2 7 2, 4 9 3, 5 9 4, 6 9 5
+E 2
+PID 8 10 running with 5 left
+Ready Queue:PID, 2 7
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4, 6 9 5
+I
+PID 8 9 running with 4 left
+Ready Queue:PID, 2 7
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4, 6 9 5
+I
+PID 8 8 running with 3 left
+Ready Queue:PID, 2 7
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4, 6 9 5
+E 5
+PID 8 7 running with 2 left
+Ready Queue:PID, 2 7, 6 9
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 8 6 running with 1 left
+Ready Queue:PID, 2 7, 6 9
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 2 7 running with 5 left
+Ready Queue:PID, 6 9, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 2 6 running with 4 left
+Ready Queue:PID, 6 9, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+D 7
+PCB 0 0 Terminated
+PID 6 9 running with 5 left
+Ready Queue:PID, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 8 running with 4 left
+Ready Queue:PID, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 7 running with 3 left
+Ready Queue:PID, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 6 running with 2 left
+Ready Queue:PID, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 5 running with 1 left
+Ready Queue:PID, 8 5
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 8 5 running with 5 left
+Ready Queue:PID, 6 4
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 8 4 running with 4 left
+Ready Queue:PID, 6 4
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 8 3 running with 3 left
+Ready Queue:PID, 6 4
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+D 3
+PCB 0 0 Terminated
+PID 6 4 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 3 running with 4 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 2 running with 3 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 6 1 running with 2 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+I
+PID 0 0 running with 5 left
+Ready Queue:PID
+Wait Queue:PID, 1 7 1, 4 9 3, 5 9 4
+X

@@ -26,6 +26,8 @@ struct PCB
 typedef struct PCB PCB;
 void execute_command(char command, int firstNumber, int secondNumber, std::ofstream &output);
 void recursive_delete(PCB process, std::ofstream &output);
+PCB find_process(int PID);
+void timer_tick(std::ofstream &output);
 std::vector<PCB> Ready_Queue; //the 1st item on the ready queue is next to be added to Running
 std::vector<PCB> Wait_Queue;
 PCB current_process;
@@ -39,12 +41,12 @@ int main(int argc, char *argv[])
     init.burst_time = 0;
     init.remaining_quantum = 0;
     current_process = init;
-    //arguments need to be an input file and a quantum size
+    //arguments need to be an input file, quantumsize, output file
     quantum = atoi(argv[2]);
     std::string filename = argv[1];
     std::ifstream input;
     input.open(filename);               //I am reading from the file given in the commandline. In this case example.txt test1.dat test2.dat and test3.dat
-    std::ofstream output("output.txt"); //output is written to output.txt
+    std::ofstream output(argv[3]); //output is written to output.txt
     std::string line;
 
     //read input
@@ -68,7 +70,7 @@ int main(int argc, char *argv[])
         {
             wait_queue_list = wait_queue_list + ", " + std::to_string(Wait_Queue[i].PID) + " " + std::to_string(Wait_Queue[i].burst_time) + " " + std::to_string(Wait_Queue[i].event_id);
         }
-        output << "PID" << current_process.PID << " " << current_process.burst_time << " running with " << current_process.remaining_quantum << " left" << std::endl;
+        output << "PID " << current_process.PID << " " << current_process.burst_time << " running with " << current_process.remaining_quantum << " left" << std::endl;
         output << "Ready Queue:"
                << "PID" << ready_queue_list << std::endl;
         output << "Wait Queue:"
@@ -122,20 +124,23 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
 
     if (command == 'C')
     { //create a PCB and add it to the Ready_Queue
+        timer_tick(output);
         PCB temp;
         temp.burst_time = secondNumber;
         temp.PID = firstNumber;
         temp.State = Ready;
         current_process.children.push_back(temp);
         Ready_Queue.push_back(temp);
-        output << "PID" << temp.PID << " " << temp.burst_time << " placed on the READY QUEUE" << std::endl;
+        output << "PID " << temp.PID << " " << temp.burst_time << " placed on the READY QUEUE" << std::endl;
     }
     else if (command == 'D')
     {
-        if (current_process.PID == init.PID)
+        if (current_process.PID != init.PID)
         {
-            recursive_delete(current_process, output); //FIX!!!!!!!
-            if (Ready_Queue.size() != 0)
+            timer_tick(output);
+            PCB temp = find_process(firstNumber);
+            recursive_delete(temp, output); //FIX!!!!!!!
+            if (current_process.PID == init.PID && Ready_Queue.size() > 0)
             {
                 current_process = Ready_Queue[0];
                 Ready_Queue.erase(Ready_Queue.begin());
@@ -149,44 +154,16 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
     }
     else if (command == 'I')
     { //Timer Interupt
-        if (current_process.PID != 0)
-        {
-            current_process.remaining_quantum--;
-            current_process.burst_time--;
-
-            if (current_process.burst_time == 0)
-            {
-                recursive_delete(current_process, output);
-                if (Ready_Queue.size() > 0)
-                {
-                    current_process = Ready_Queue[0];
-                    Ready_Queue.erase(Ready_Queue.begin());
-                    current_process.remaining_quantum = quantum;
-                    current_process.State = Running;
-                }
-                else
-                {
-                    current_process = init;
-                }
-            }
-        }
-
-        if (current_process.remaining_quantum <= 0) //switch out the current process
-        {
-            current_process.State = Ready;
-            Ready_Queue.push_back(current_process);
-            current_process = Ready_Queue[0];
-            Ready_Queue.erase(Ready_Queue.begin());
-            current_process.remaining_quantum = quantum;
-            current_process.State = Running;
-        }
+        timer_tick(output);
     }
     else if (command == 'W')
     { //Current running process is moved to waiting queue with event id (EID) n
+        timer_tick(output);
         if (current_process.PID != 0)
         {
             current_process.event_id = firstNumber;
             current_process.State = Waiting;
+            output<<"PID "<< current_process.PID<<" "<<current_process.burst_time<< " "<<current_process.event_id<< " placed on the WAIT_QUEUE"<<std::endl;
             Wait_Queue.push_back(current_process);
         }
 
@@ -205,6 +182,7 @@ void execute_command(char command, int firstNumber, int secondNumber, std::ofstr
     else if (command == 'E')
     { //(EID) n happens process moves to Ready Queue
         //run a loop through the wait queue
+        timer_tick(output);
         PCB temp;
         for (int i = 0; i < Wait_Queue.size(); i++)
         {
@@ -249,6 +227,7 @@ void recursive_delete(PCB process, std::ofstream &output)
         }
         else
         {
+            current_process = init;
             output << "PCB " << process.PID << " " << process.burst_time << " Terminated" << std::endl;
         }
     }
@@ -262,5 +241,61 @@ void recursive_delete(PCB process, std::ofstream &output)
         }
         process.children.clear();
         recursive_delete(process, output);
+    }
+}
+PCB find_process(int PID)
+{
+    if (current_process.PID == PID)
+    {
+        return current_process;
+    }
+    for (int i = 0; i < Ready_Queue.size(); i++)
+    {
+        if (Ready_Queue[i].PID == PID)
+        {
+            return Ready_Queue[i];
+        }
+    }
+    for (int i = 0; i < Wait_Queue.size(); i++)
+    {
+        if (Wait_Queue[i].PID == PID)
+        {
+            return Wait_Queue[i];
+        }
+    }
+    return init;
+}
+void timer_tick(std::ofstream &output)
+{
+    if (current_process.PID != 0)
+    {
+        current_process.remaining_quantum--;
+        current_process.burst_time--;
+
+        if (current_process.burst_time == 0)
+        {
+            recursive_delete(current_process, output);
+            if (Ready_Queue.size() > 0)
+            {
+                current_process = Ready_Queue[0];
+                Ready_Queue.erase(Ready_Queue.begin());
+                current_process.remaining_quantum = quantum;
+                current_process.State = Running;
+            }
+            else
+            {
+                current_process = init;
+            }
+        }
+    }
+
+    if (current_process.remaining_quantum <= 0) //switch out the current process
+    {
+        current_process.State = Ready;
+        Ready_Queue.push_back(current_process);
+        current_process = Ready_Queue[0];
+        Ready_Queue.erase(Ready_Queue.begin());
+        current_process.remaining_quantum = quantum;
+        current_process.State = Running;
     }
 }
